@@ -31,7 +31,9 @@ Użytkownik nie musi ręcznie sterować systemem.
 - DoorSensor – czujnik drzwi, który wykrywa otwarcie lub zamknięcie drzwi.
 - Siren – urządzenie alarmowe, które emituje dźwięk ostrzegawczy.
 #### Processor
-- CPU – procesor, na którym działają procesy i wątki systemu alarmowego.
+- CPU_Sensor - przetwarzanie danych z czujników
+- CPU_Controller - analiza danych i podejmowanie decyzji alarmowych
+- CPU_Alarm	- zarządzanie sygnałami alarmowymi
 #### Memory
 - RAM - pamięć systemowa używana przez kontroler do przechowywania danych.
 #### Bus
