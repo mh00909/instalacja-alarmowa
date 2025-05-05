@@ -23,26 +23,28 @@ Użytkownik nie musi ręcznie sterować systemem.
 
 ### Komponenty
 #### Data
-- MotionDetected
-- DoorOpened
-- AlarmSignal
+- MotionDetected – sygnał logiczny informujący, czy wykryto ruch.
+- DoorOpened – sygnał logiczny wskazujący, czy drzwi zostały otwarte.
+- AlarmSignal – sygnał logiczny aktywujący lub dezaktywujący alarm.
 #### Device
-- MotionSensor
-- DoorSensor
-- Siren
+- MotionSensor – czujnik ruchu, który generuje dane o wykrytym ruchu.
+- DoorSensor – czujnik drzwi, który wykrywa otwarcie lub zamknięcie drzwi.
+- Siren – urządzenie alarmowe, które emituje dźwięk ostrzegawczy.
 #### Processor
-- CPU
+- CPU – procesor, na którym działają procesy i wątki systemu alarmowego.
 #### Memory
-- RAM
+- RAM - pamięć systemowa używana przez kontroler do przechowywania danych.
 #### Bus
-- MainBus
+- MainBus - magistrala komunikacyjna, przez którą przesyłane są dane między komponentami.
 #### Thread
-- ReadMotionThread
-- CheckDoorThread
-- TriggerAlarmThread
+- ReadMotionThread – wątek cykliczny odczytujący dane z czujnika ruchu.
+- CheckDoorThread – wątek reagujący na zdarzenia związane z otwarciem drzwi.
+- TriggerAlarmThread – wątek analizujący dane z czujników i decydujący o uruchomieniu alarmu.
 #### Process
-- MonitorProc
+- SensorProc -	Przetwarza dane z czujników i przygotowuje je do przesłania do głównego kontrolera.
+- MonitorProc	- Główna logika decyzji (czy włączyć alarm) na podstawie danych z SensorProc.
+- AlarmProc	- Zarządza wszystkimi akcjami alarmowymi (syrena, światła, powiadomienia).
 #### System
-- SensorsUnit
-- AlarmUnit
-- AlarmSystem
+- SensorsUnit – jednostka zbierająca dane z czujników i przekazująca je do kontrolera.
+- AlarmUnit – jednostka alarmowa odpowiedzialna za uruchomienie syreny.
+- AlarmSystem – kompletny system alarmowy.
