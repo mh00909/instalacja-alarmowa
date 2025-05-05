@@ -31,7 +31,6 @@ Użytkownik nie musi ręcznie sterować systemem.
 - DoorSensor – czujnik drzwi, który wykrywa otwarcie lub zamknięcie drzwi.
 - Siren – urządzenie alarmowe, które emituje dźwięk ostrzegawczy.
 #### Processor
-- CPU_Sensor - przetwarzanie danych z czujników
 - CPU_Controller - analiza danych i podejmowanie decyzji alarmowych
 - CPU_Alarm	- zarządzanie sygnałami alarmowymi
 #### Memory
