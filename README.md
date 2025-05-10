@@ -1,51 +1,46 @@
-## Tytuł modelu
+### 1. Tytuł modelu
 Model instalacji alarmowej 
 
-### Dane studenta
+### 2. Dane studenta
 Monika Halek
 
 E-mail: mhalek@student.agh.edu.pl
-### Opis modelowanego systemu
-Model przedstawia architekturę instalacji alarmowej zaprojektowanej w języku AADL. System składa się z czujników (ruchu i drzwi), kontrolera przetwarzającego sygnały z sensorów, modułu alarmowego z syreną oraz komponentów sprzętowych, 
-takich jak procesor, pamięć i magistrala danych. 
+### 3. Opis modelowanego systemu
+Instalacja alarmowa to system, którego zadaniem jest wykrywanie zagrożeń w budynku, takich jak: nieautoryzowany ruch, otwarcie drzwi lub pojawienie się dymu, oraz reagowanie na te zdarzenia poprzez aktywację alarmu dźwiękowego i wysyłanie powiadomień do użytkownika.
 
-### Opis ogólny
-System alarmowy został podzielony na trzy główne jednostki:
-- SensorsUnit – zbiera dane o otoczeniu (czy wykryto ruch, czy otwarto drzwi).
-- Controller – analizuje dane z sensorów i podejmuje decyzję, czy włączyć alarm.
-- AlarmUnit – syrena aktywująca się, gdy kontroler wykryje zagrożenie.
-
-Komunikacja między komponentami odbywa się przez porty danych i połączenia, przy użyciu wspólnej magistrali (MainBus). Wątkami w procesie kontrolera zarządza procesor, a dane są przetwarzane w pamięci RAM. 
-
-### Opis dla użytkownika
-Czujniki systemu ciągle monitorują otoczenie. Gdy wykryją ruch lub otwarcie drzwi, dane trafiają do jednostki kontrolnej, która podejmuje decyzję o aktywacji alarmu. Jeśli wykryte zostanie zagrożenie, włącza się syrena alarmowa. 
-Użytkownik nie musi ręcznie sterować systemem.
-
-### Komponenty
+### 4. Komponenty
 #### Data
-- MotionDetected – sygnał logiczny informujący, czy wykryto ruch.
-- DoorOpened – sygnał logiczny wskazujący, czy drzwi zostały otwarte.
-- AlarmSignal – sygnał logiczny aktywujący lub dezaktywujący alarm.
+- **MotionDetected** - informacja, czy wykryto ruch
+- **DoorOpened** - informacja, czy otwarto drzwi
+- **SmokeDetected**- informacja, czy wykryto dym
+- **ControlSignal** - sygnał z panelu sterowania
+- **AlarmDecision** - decyzja o aktywacji alarmu
+- **NotificationSignal** - dane o powiadomieniu
 #### Device
-- MotionSensor – czujnik ruchu, który generuje dane o wykrytym ruchu.
-- DoorSensor – czujnik drzwi, który wykrywa otwarcie lub zamknięcie drzwi.
-- Siren – urządzenie alarmowe, które emituje dźwięk ostrzegawczy.
+- **MotionSensor** - czujnik ruchu
+- **DoorSensor** - czujnik drzwi
+- **SmokeSensor** - czujnik dymu
+- **Siren** - syrena alarmowa
+- **NetworkInterface** - moduł komunikacji
+- **ControlPanel** - panel sterowania
 #### Processor
-- CPU_Controller - analiza danych i podejmowanie decyzji alarmowych
-- CPU_Alarm	- zarządzanie sygnałami alarmowymi
+- CPU_Main - obsługuje SensorsUnit i AlarmUnit  
 #### Memory
 - RAM - pamięć systemowa używana przez kontroler do przechowywania danych.
 #### Bus
 - MainBus - magistrala komunikacyjna, przez którą przesyłane są dane między komponentami.
 #### Thread
-- ReadMotionThread – wątek cykliczny odczytujący dane z czujnika ruchu.
-- CheckDoorThread – wątek reagujący na zdarzenia związane z otwarciem drzwi.
-- TriggerAlarmThread – wątek analizujący dane z czujników i decydujący o uruchomieniu alarmu.
+- **ReadMotionThread** - odczyt MotionSensor
+- **CheckDoorThread** - odczyt DoorSensor
+- **ReadSmokeThread** - odczyt SmokeSensor
+- **EvaluateThreatThread** - analiza danych z SensorMonitorProc
+- **HandleControlThread** - obsługa ControlPanel
+- **SendNotificationThread** - przygotowanie i wysyłanie powiadomień
 #### Process
-- SensorProc -	Przetwarza dane z czujników i przygotowuje je do przesłania do głównego kontrolera.
-- MonitorProc	- Główna logika decyzji (czy włączyć alarm) na podstawie danych z SensorProc.
-- AlarmProc	- Zarządza wszystkimi akcjami alarmowymi (syrena, światła, powiadomienia).
+- **SensorMonitorProc** - zbiera dane z czujników, przesyła statusy do AlarmUnit
+- **AlarmProc** - analizuje dane z SensorsUnit i ControlPanel, decyduje o alarmie
+- **NotificationProc** - generuje i wysyła powiadomienia przez NetworkInterface
 #### System
-- SensorsUnit – jednostka zbierająca dane z czujników i przekazująca je do kontrolera.
-- AlarmUnit – jednostka alarmowa odpowiedzialna za uruchomienie syreny.
-- AlarmSystem – kompletny system alarmowy.
+- **AlarmSystem** - cały system alarmowy
+- **SensorsUnit** - podsystem obsługi czujników
+- **AlarmUnit** - podsystem analizy, sterowania, powiadomień
