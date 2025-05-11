@@ -51,4 +51,6 @@ Instalacja alarmowa to system, którego zadaniem jest wykrywanie zagrożeń w bu
 - **AlarmProc** - analizuje dane z SensorsUnit i ControlPanel, decyduje o alarmie
 - **NotificationProc** - generuje i wysyła powiadomienia przez NetworkInterface
 #### System
-- **AlarmSystem** 
+- **AlarmSystem** - cały system alarmowy
+- **SensorsUnit** - podsystem obsługi czujników
+- **AlarmUnit** - podsystem analizy, sterowania, powiadomień
