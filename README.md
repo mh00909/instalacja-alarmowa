@@ -32,6 +32,9 @@ Instalacja alarmowa to system przeznaczony do wykrywania zagrożeń w budynku, t
 - **AlarmDecision** - decyzja o aktywacji alarmu
 - **NotificationSignal** - dane powiadomienia wysyłane do użytkownika
 - **LightAlarmSignal** – sygnał do aktywacji alarmu świetlnego
+- **SystemStatusData** – status systemu
+- **UserCommandData** – komendy użytkownika
+- **ErrorCodeData** – kod błędu
 #### Device
 - **MotionSensor** - czujnik ruchu
 - **DoorSensor** - czujnik drzwi
@@ -41,6 +44,7 @@ Instalacja alarmowa to system przeznaczony do wykrywania zagrożeń w budynku, t
 - **LightAlarm** – alarm świetlny (migająca lampa)
 - **NetworkInterface** - moduł odpowiedzialny za wysyłanie powiadomień
 - **ControlPanel** - panel sterowania
+- **UserInterfacePanel** – interfejs użytkownika (przyjmuje komendy i wyświetla status systemu)
 #### Processor
 - CPU_Main - główny procesor systemu
 #### Memory
@@ -54,14 +58,16 @@ Instalacja alarmowa to system przeznaczony do wykrywania zagrożeń w budynku, t
 - **ReadTemperatureThread** – wątek przetwarzający dane z TemperatureSensor
 - **EvaluateThreatThread** - wątek analizujący dane z czujników i panelu sterowania, generujący decyzję alarmową, powiadomienie i sygnał świetlny
 - **SendNotificationThread** - wątek przekazujący dane powiadomień do modułu komunikacyjnego
-- **ActivateOutputsThread** - aktywacja syreny i alarmu świetlnego po wykryciu zagrożenia
+- **ReadUserCommandThread** – odczytuje komendy użytkownika
+- **DisplaySystemStatusThread** – wyświetla status systemu
 #### Process
 - **SensorMonitorProc** - proces odpowiedzialny za odbiór i przekazywanie danych z czujników
 - **AlarmProc** - proces decyzyjny analizujący dane i sterujący alarmem
 - **NotificationProc** - proces odpowiedzialny za przekazanie powiadomień do użytkownika
+- **UserInterfaceProc** – zarządza komendami użytkownika i wyświetlaniem statusu
 #### System
 - **AlarmSystem** - główny system integrujący wszystkie komponenty
 
-### 5. Architektura
-![diagram1](https://github.com/user-attachments/assets/e9ed4e07-cdda-408e-861c-8368f8387717)
+### 5. Diagram modelu
+![diagram](https://github.com/user-attachments/assets/0afa0f2d-a74b-4430-ac1b-a10fa6a02c08)
 
