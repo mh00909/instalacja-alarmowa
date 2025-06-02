@@ -82,3 +82,12 @@ Dane z czujników są odbierane przez dedykowane wątki przetwarzające, które 
 ### 5. Diagram modelu
 ![diagram1](https://github.com/user-attachments/assets/0e6979fe-43d5-42a8-b534-3b0208f99e79)
 
+### 6. Przeprowadzone analizy
+
+### 7. Bibliografia
+
+- https://insights.sei.cmu.edu/documents/788/2007_005_001_14891.pdf
+- https://www.dipolnet.com/basic_information_on_intruder_alarm_systems_bib770.htm
+- https://www.rapidalarms.com.au/alarm-system-components/
+- https://reolink.com/blog/security-system-components/?srsltid=AfmBOoqDGheuvTGJQnjT0yzs-q5OulM6rrEHBxF4OdmJAeSBi3YUjKun
+
