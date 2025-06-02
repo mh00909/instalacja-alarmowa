@@ -1,0 +1,136 @@
+Bus load analysis of AlarmSystem_impl_Instance,,,,
+,,,,
+,,,,
+Physical Bus,Capacity (KB/s),Budget (KB/s),Required Budget (KB/s),Actual (KB/s)
+main_bus,2000.0,200.0,0.0,6.2
+i2c_bus,400.0,100.0,0.0,0.2
+spi_bus,1000.0,500.0,0.0,5.4
+ui_bus,1000.0,500.0,0.0,0.0
+,,,,
+Bus main_bus has data overhead of 0 bytes,,,,
+Bound Virtual Bus/Connection,Capacity (KB/s),Budget (KB/s),Required Budget (KB/s),Actual (KB/s)
+ui_panel.status_out -> user_interface.display.status_in,,0.0,,1.0
+sensor_monitor.motion_reader.motion_out -> alarm_logic.evaluator.motion,,0.0,,0.05
+sensor_monitor.door_reader.door_out -> alarm_logic.evaluator.door,,0.0,,0.05
+sensor_monitor.smoke_reader.smoke_out -> alarm_logic.evaluator.smoke,,0.0,,0.05
+sensor_monitor.temp_reader.temp_out -> alarm_logic.evaluator.temp,,0.0,,0.05
+alarm_logic.evaluator.log_out -> logger.writer.log_in,,0.0,,2.5
+alarm_logic.evaluator.status_out -> ui_panel.status_in,,0.0,,2.5
+cpu.main_bus_access -> ram.bus_access,,0.0,,0.0
+cpu.main_bus_access -> log_memory.bus_access,,0.0,,0.0
+,,,,
+Connection ui_panel.status_out -> user_interface.display.status_in bound to main_bus,,,,
+WARNING: Connection ui_panel.status_out -> user_interface.display.status_in has no bandwidth budget,,,,
+,,,,
+Connection sensor_monitor.motion_reader.motion_out -> alarm_logic.evaluator.motion bound to main_bus,,,,
+WARNING: Connection sensor_monitor.motion_reader.motion_out -> alarm_logic.evaluator.motion has no bandwidth budget,,,,
+,,,,
+Connection sensor_monitor.door_reader.door_out -> alarm_logic.evaluator.door bound to main_bus,,,,
+WARNING: Connection sensor_monitor.door_reader.door_out -> alarm_logic.evaluator.door has no bandwidth budget,,,,
+,,,,
+Connection sensor_monitor.smoke_reader.smoke_out -> alarm_logic.evaluator.smoke bound to main_bus,,,,
+WARNING: Connection sensor_monitor.smoke_reader.smoke_out -> alarm_logic.evaluator.smoke has no bandwidth budget,,,,
+,,,,
+Connection sensor_monitor.temp_reader.temp_out -> alarm_logic.evaluator.temp bound to main_bus,,,,
+WARNING: Connection sensor_monitor.temp_reader.temp_out -> alarm_logic.evaluator.temp has no bandwidth budget,,,,
+,,,,
+Connection alarm_logic.evaluator.log_out -> logger.writer.log_in bound to main_bus,,,,
+WARNING: Connection alarm_logic.evaluator.log_out -> logger.writer.log_in has no bandwidth budget,,,,
+,,,,
+Connection alarm_logic.evaluator.status_out -> ui_panel.status_in bound to main_bus,,,,
+WARNING: Connection alarm_logic.evaluator.status_out -> ui_panel.status_in has no bandwidth budget,,,,
+,,,,
+Connection cpu.main_bus_access -> ram.bus_access bound to main_bus,,,,
+WARNING: Connection cpu.main_bus_access -> ram.bus_access has no bandwidth budget,,,,
+,,,,
+Connection cpu.main_bus_access -> log_memory.bus_access bound to main_bus,,,,
+WARNING: Connection cpu.main_bus_access -> log_memory.bus_access has no bandwidth budget,,,,
+,,,,
+Bus i2c_bus has data overhead of 0 bytes,,,,
+Bound Virtual Bus/Connection,Capacity (KB/s),Budget (KB/s),Required Budget (KB/s),Actual (KB/s)
+motion_sensor.motion_out -> sensor_monitor.motion_reader.motion_in,,0.0,,0.05
+door_sensor.door_out -> sensor_monitor.door_reader.door_in,,0.0,,0.05
+smoke_sensor.smoke_out -> sensor_monitor.smoke_reader.smoke_in,,0.0,,0.05
+temp_sensor.temp_out -> sensor_monitor.temp_reader.temp_in,,0.0,,0.05
+cpu.i2c_access -> motion_sensor.bus_access,,0.0,,0.0
+cpu.i2c_access -> door_sensor.bus_access,,0.0,,0.0
+cpu.i2c_access -> smoke_sensor.bus_access,,0.0,,0.0
+cpu.i2c_access -> temp_sensor.bus_access,,0.0,,0.0
+,,,,
+Connection motion_sensor.motion_out -> sensor_monitor.motion_reader.motion_in bound to i2c_bus,,,,
+WARNING: Connection motion_sensor.motion_out -> sensor_monitor.motion_reader.motion_in has no bandwidth budget,,,,
+,,,,
+Connection door_sensor.door_out -> sensor_monitor.door_reader.door_in bound to i2c_bus,,,,
+WARNING: Connection door_sensor.door_out -> sensor_monitor.door_reader.door_in has no bandwidth budget,,,,
+,,,,
+Connection smoke_sensor.smoke_out -> sensor_monitor.smoke_reader.smoke_in bound to i2c_bus,,,,
+WARNING: Connection smoke_sensor.smoke_out -> sensor_monitor.smoke_reader.smoke_in has no bandwidth budget,,,,
+,,,,
+Connection temp_sensor.temp_out -> sensor_monitor.temp_reader.temp_in bound to i2c_bus,,,,
+WARNING: Connection temp_sensor.temp_out -> sensor_monitor.temp_reader.temp_in has no bandwidth budget,,,,
+,,,,
+Connection cpu.i2c_access -> motion_sensor.bus_access bound to i2c_bus,,,,
+WARNING: Connection cpu.i2c_access -> motion_sensor.bus_access has no bandwidth budget,,,,
+,,,,
+Connection cpu.i2c_access -> door_sensor.bus_access bound to i2c_bus,,,,
+WARNING: Connection cpu.i2c_access -> door_sensor.bus_access has no bandwidth budget,,,,
+,,,,
+Connection cpu.i2c_access -> smoke_sensor.bus_access bound to i2c_bus,,,,
+WARNING: Connection cpu.i2c_access -> smoke_sensor.bus_access has no bandwidth budget,,,,
+,,,,
+Connection cpu.i2c_access -> temp_sensor.bus_access bound to i2c_bus,,,,
+WARNING: Connection cpu.i2c_access -> temp_sensor.bus_access has no bandwidth budget,,,,
+,,,,
+Bus spi_bus has data overhead of 0 bytes,,,,
+Bound Virtual Bus/Connection,Capacity (KB/s),Budget (KB/s),Required Budget (KB/s),Actual (KB/s)
+control_panel.control_out -> alarm_logic.evaluator.ctrl_in,,0.0,,0.05
+ui_panel.command_out -> alarm_logic.evaluator.cmd_in,,0.0,,1.0
+alarm_logic.evaluator.alarm_out -> siren.alarm_in,,0.0,,0.05
+alarm_logic.evaluator.light_out -> light_alarm.light_in,,0.0,,0.05
+alarm_logic.evaluator.notify_out -> notifier.notifier.notify_in,,0.0,,2.5
+notifier.notifier.notify_out -> network.notify_in,,0.0,,1.25
+user_interface.reader.command_out -> ui_panel.command_in,,0.0,,0.5
+cpu.spi_access -> control_panel.bus_access,,0.0,,0.0
+cpu.spi_access -> siren.bus_access,,0.0,,0.0
+cpu.spi_access -> light_alarm.bus_access,,0.0,,0.0
+cpu.spi_access -> network.bus_access,,0.0,,0.0
+,,,,
+Connection control_panel.control_out -> alarm_logic.evaluator.ctrl_in bound to spi_bus,,,,
+WARNING: Connection control_panel.control_out -> alarm_logic.evaluator.ctrl_in has no bandwidth budget,,,,
+,,,,
+Connection ui_panel.command_out -> alarm_logic.evaluator.cmd_in bound to spi_bus,,,,
+WARNING: Connection ui_panel.command_out -> alarm_logic.evaluator.cmd_in has no bandwidth budget,,,,
+,,,,
+Connection alarm_logic.evaluator.alarm_out -> siren.alarm_in bound to spi_bus,,,,
+WARNING: Connection alarm_logic.evaluator.alarm_out -> siren.alarm_in has no bandwidth budget,,,,
+,,,,
+Connection alarm_logic.evaluator.light_out -> light_alarm.light_in bound to spi_bus,,,,
+WARNING: Connection alarm_logic.evaluator.light_out -> light_alarm.light_in has no bandwidth budget,,,,
+,,,,
+Connection alarm_logic.evaluator.notify_out -> notifier.notifier.notify_in bound to spi_bus,,,,
+WARNING: Connection alarm_logic.evaluator.notify_out -> notifier.notifier.notify_in has no bandwidth budget,,,,
+,,,,
+Connection notifier.notifier.notify_out -> network.notify_in bound to spi_bus,,,,
+WARNING: Connection notifier.notifier.notify_out -> network.notify_in has no bandwidth budget,,,,
+,,,,
+Connection user_interface.reader.command_out -> ui_panel.command_in bound to spi_bus,,,,
+WARNING: Connection user_interface.reader.command_out -> ui_panel.command_in has no bandwidth budget,,,,
+,,,,
+Connection cpu.spi_access -> control_panel.bus_access bound to spi_bus,,,,
+WARNING: Connection cpu.spi_access -> control_panel.bus_access has no bandwidth budget,,,,
+,,,,
+Connection cpu.spi_access -> siren.bus_access bound to spi_bus,,,,
+WARNING: Connection cpu.spi_access -> siren.bus_access has no bandwidth budget,,,,
+,,,,
+Connection cpu.spi_access -> light_alarm.bus_access bound to spi_bus,,,,
+WARNING: Connection cpu.spi_access -> light_alarm.bus_access has no bandwidth budget,,,,
+,,,,
+Connection cpu.spi_access -> network.bus_access bound to spi_bus,,,,
+WARNING: Connection cpu.spi_access -> network.bus_access has no bandwidth budget,,,,
+,,,,
+Bus ui_bus has data overhead of 0 bytes,,,,
+Bound Virtual Bus/Connection,Capacity (KB/s),Budget (KB/s),Required Budget (KB/s),Actual (KB/s)
+cpu_ui.ui_bus_access -> ui_panel.bus_access,,0.0,,0.0
+,,,,
+Connection cpu_ui.ui_bus_access -> ui_panel.bus_access bound to ui_bus,,,,
+WARNING: Connection cpu_ui.ui_bus_access -> ui_panel.bus_access has no bandwidth budget,,,,

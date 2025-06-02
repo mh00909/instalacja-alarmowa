@@ -1,0 +1,33 @@
+Test scheduability Report,,,,,,,
+,,,,,,,
+Processor Utilization/Scheduling Results,,,,,,,
+Schedulability Results,,,,,,,
+,,,,,,,
+thread name,period,deadline,execution time,phase offset,priority,max response time,schedulability
+AlarmSystem_impl_Instance.sensor_monitor.motion_reader,20000,15000,2000,0,7,2000.0,true
+AlarmSystem_impl_Instance.sensor_monitor.door_reader,20000,15000,2000,0,6,4000.0,true
+AlarmSystem_impl_Instance.sensor_monitor.smoke_reader,20000,15000,2000,0,5,6000.0,true
+AlarmSystem_impl_Instance.sensor_monitor.temp_reader,20000,15000,2000,0,4,8000.0,true
+AlarmSystem_impl_Instance.alarm_logic.evaluator,20000,15000,8000,0,3,16000.0,false
+AlarmSystem_impl_Instance.notifier.notifier,40000,20000,4000,0,2,20000.0,true
+AlarmSystem_impl_Instance.logger.writer,100000,50000,6000,0,1,78000.0,false
+,,,,,,,
+,,,,,,,
+Schedulability Results,,,,,,,
+cpu_ui: Processor AlarmSystem_impl_Instance.cpu_ui is schedulable with utilization 4.0%,,,,,,,
+thread name,period,deadline,execution time,phase offset,priority,max response time,schedulability
+AlarmSystem_impl_Instance.user_interface.reader,100000,30000,2000,0,2,2000.0,true
+AlarmSystem_impl_Instance.user_interface.display,100000,30000,2000,0,1,4000.0,true
+,,,,,,,
+,,,,,,,
+,,,,,,,
+Thread binding report,,,,,,,
+thread sensor_monitor.motion_reader(0,220 MIPS) ==> processor cpu(2,20MIPS) Utilization 10,0%,,,,
+thread sensor_monitor.door_reader(0,220 MIPS) ==> processor cpu(2,20MIPS) Utilization 10,0%,,,,
+thread sensor_monitor.smoke_reader(0,220 MIPS) ==> processor cpu(2,20MIPS) Utilization 10,0%,,,,
+thread sensor_monitor.temp_reader(0,220 MIPS) ==> processor cpu(2,20MIPS) Utilization 10,0%,,,,
+thread alarm_logic.evaluator(0,880 MIPS) ==> processor cpu(2,20MIPS) Utilization 40,0%,,,,
+thread notifier.notifier(0,220 MIPS) ==> processor cpu(2,20MIPS) Utilization 10,0%,,,,
+thread user_interface.reader(0,024 MIPS) ==> processor cpu_ui(1,20MIPS) Utilization 2,0%,,,,
+thread user_interface.display(0,024 MIPS) ==> processor cpu_ui(1,20MIPS) Utilization 2,0%,,,,
+thread logger.writer(0,132 MIPS) ==> processor cpu(2,20MIPS) Utilization 6,0%,,,,
