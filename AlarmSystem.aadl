@@ -1,0 +1,957 @@
+package AlarmSystem
+public
+  with Base_Types;
+  with Data_Model;
+  with Deployment_Properties;
+  with sei;
+
+-- DATA TYPES 
+data MotionDetected
+  properties
+    Data_Model::Data_Representation => Boolean;
+    Data_Size => 1 Bytes;
+end MotionDetected;
+
+data DoorOpened
+  properties
+    Data_Model::Data_Representation => Boolean;
+    Data_Size => 1 Bytes;
+end DoorOpened;
+
+data SmokeDetected
+  properties
+    Data_Model::Data_Representation => Boolean;
+    Data_Size => 1 Bytes;
+end SmokeDetected;
+
+data OverheatDetected
+  properties
+    Data_Model::Data_Representation => Boolean;
+    Data_Size => 1 Bytes;
+end OverheatDetected;
+
+data ControlSignal
+  properties
+    Data_Model::Data_Representation => Boolean;
+    Data_Size => 1 Bytes;
+end ControlSignal;
+
+data AlarmDecision
+  properties
+    Data_Model::Data_Representation => Boolean;
+    Data_Size => 1 Bytes;
+end AlarmDecision;
+
+data NotificationSignal
+  properties
+    Data_Model::Data_Representation => String;
+    Data_Size => 50 Bytes;
+end NotificationSignal;
+
+data LightAlarmSignal
+  properties
+    Data_Model::Data_Representation => Boolean;
+    Data_Size => 1 Bytes;
+end LightAlarmSignal;
+
+data SystemStatusData
+  properties
+    Data_Model::Data_Representation => String; -- np. "armed", "disarmed", "test", "error"
+    Data_Size => 50 Bytes;
+end SystemStatusData;
+
+data UserCommandData
+  properties
+    Data_Model::Data_Representation => String; -- np. "arm", "disarm", "test"
+    Data_Size => 50 Bytes;
+end UserCommandData;
+
+data LogData
+  properties
+    Data_Model::Data_Representation => String;
+    Data_Size => 50 Bytes;
+end LogData;
+
+
+
+-- BUS 
+bus MainBus
+  properties
+    SEI::GrossWeight => 0.1kg;
+    Transmission_Time => [Fixed => 1 ns .. 2 ns; PerByte => 5 ns .. 6 ns;];
+    Period => 1 ms;
+    SEI::BandWidthCapacity => 2.0 MBytesps;
+    SEI::BandWidthBudget => 200.0 KBytesps;
+end MainBus;
+
+bus I2CBus
+  properties
+    SEI::BandWidthCapacity => 800.0 KBytesps;
+    SEI::BandWidthBudget => 100.0 KBytesps;
+    Transmission_Time => [Fixed => 2 ns .. 5 ns; PerByte => 10 ns .. 15 ns;];
+    Period => 2 ms;
+end I2CBus;
+
+bus SPIBus
+  properties
+    SEI::BandWidthCapacity => 1.0 MBytesps;
+    SEI::BandWidthBudget => 500.0 KBytesps;
+    Transmission_Time => [Fixed => 1 ns .. 2 ns; PerByte => 5 ns .. 6 ns;];
+    Period => 1 ms;
+end SPIBus;
+
+bus UIBus
+  properties
+    SEI::BandWidthCapacity => 1.0 MBytesps;
+    SEI::BandWidthBudget => 500.0 KBytesps;
+    Transmission_Time => [Fixed => 1 ns .. 2 ns; PerByte => 5 ns .. 6 ns;];
+    Period => 1 ms;
+end UIBus;
+
+-- DEVICES
+device MotionSensor
+  features
+    motion_out: out data port MotionDetected;
+    bus_access: requires bus access I2CBus;
+  flows
+    motion_src: flow source motion_out { latency => 2 ms .. 5 ms; };
+  properties
+  	SEI::GrossWeight => 0.2kg; 
+  	Dispatch_Protocol => Periodic;
+    Period => 20 ms;
+end MotionSensor;
+
+device DoorSensor
+  features
+    door_out: out data port DoorOpened;
+    bus_access: requires bus access I2CBus;
+  flows
+    door_src: flow source door_out { latency => 1 ms .. 3 ms; };
+  properties
+	SEI::GrossWeight => 0.2kg; 
+	Dispatch_Protocol => Periodic;
+    Period => 20 ms;
+end DoorSensor;
+
+device SmokeSensor
+  features
+    smoke_out: out data port SmokeDetected;
+    bus_access: requires bus access I2CBus;
+  flows
+    smoke_src: flow source smoke_out { latency => 1 ms .. 3 ms; };
+  properties
+  	SEI::GrossWeight => 0.2kg; 
+  	Dispatch_Protocol => Periodic;
+    Period => 20 ms;
+end SmokeSensor;
+
+device TemperatureSensor
+  features
+    temp_out: out data port OverheatDetected;
+    bus_access: requires bus access I2CBus;
+  flows
+    temp_src: flow source temp_out { latency => 1 ms .. 3 ms; };
+  properties
+  	SEI::GrossWeight => 0.2kg; 
+  	Dispatch_Protocol => Periodic;
+    Period => 20 ms;
+end TemperatureSensor;
+
+
+device ControlPanel
+  features
+    control_out: out data port ControlSignal;
+    bus_access: requires bus access SPIBus;
+  flows
+    control_src: flow source control_out { latency => 1 ms .. 2 ms; };
+  properties
+    SEI::GrossWeight => 0.2kg; 
+    Dispatch_Protocol => Periodic;
+    Period => 20 ms;
+end ControlPanel;
+
+device Siren
+  features
+    alarm_in: in data port AlarmDecision;
+    bus_access: requires bus access SPIBus;
+  flows
+    siren_sink: flow sink alarm_in { latency => 5 ms .. 10 ms; };
+  properties
+	SEI::GrossWeight => 0.3kg; 
+	Dispatch_Protocol => Sporadic;
+    Period => 10 ms;
+end Siren;
+
+device LightAlarm
+  features
+    light_in: in data port LightAlarmSignal;
+    bus_access: requires bus access SPIBus;
+  flows
+    light_sink: flow sink light_in { latency => 5 ms .. 10 ms; };
+  properties
+  	SEI::GrossWeight => 0.25kg; 
+  	Dispatch_Protocol => Sporadic;
+    Period => 10 ms;
+end LightAlarm;
+
+device NetworkInterface
+  features
+    notify_in: in data port NotificationSignal;
+    bus_access: requires bus access SPIBus;
+  flows
+    notify_sink: flow sink notify_in { latency => 5 ms .. 10 ms; };
+  properties
+  	SEI::GrossWeight => 0.25kg;
+  	Dispatch_Protocol => Sporadic;
+    Period => 10 ms;
+end NetworkInterface;
+
+device UserInterfacePanel
+  features
+    command_in: in data port UserCommandData;
+    command_out: out data port UserCommandData;
+    status_out: out data port SystemStatusData;
+    status_in: in data port SystemStatusData;
+    bus_access: requires bus access UIBus;
+  flows
+  status_src: flow source status_out;
+  forward_cmd: flow path command_in -> command_out;
+  status_flow: flow path status_in -> status_out;
+  properties
+    Dispatch_Protocol => Periodic;
+    Period => 50 ms;
+    SEI::GrossWeight => 0.3kg;
+end UserInterfacePanel;
+
+
+
+-- PROCESSOR
+processor CPU_Main
+  features
+    main_bus_access: provides bus access MainBus;
+    i2c_access: provides bus access I2CBus;
+    spi_access: provides bus access SPIBus;
+  properties
+    SEI::GrossWeight => 0.05kg;
+    Scheduling_Protocol => (Round_Robin_Protocol);
+    Clock_Period => 1 ms;
+    Timing_Properties::Processor_Capacity => 1.0 MIPS;
+    SEI::MIPSCapacity => 2.5 mips;
+end CPU_Main;
+
+processor CPU_UI
+  features
+    ui_bus_access: provides bus access UIBus;
+  properties
+    SEI::MIPSCapacity => 1.2 mips;
+    Scheduling_Protocol => (Round_Robin_Protocol);
+    SEI::GrossWeight => 0.05kg;
+    Clock_Period => 1 ms; 
+    Timing_Properties::Processor_Capacity => 0.8 MIPS; 
+end CPU_UI;
+
+
+-- MEMORY
+memory RAM
+  features
+    bus_access: requires bus access MainBus;
+  properties
+  	SEI::GrossWeight => 0.03kg;
+  	Memory_Properties::Memory_Size => 20000 Bytes;
+end RAM;
+
+memory LogMemory
+  features
+    bus_access: requires bus access MainBus;
+  properties
+  	SEI::GrossWeight => 0.05kg;  
+	Memory_Properties::Memory_Size => 10000 Bytes;
+
+end LogMemory;
+
+
+-- THREADS 
+thread ReadMotionThread
+  features
+    motion_in: in data port MotionDetected;
+    motion_out: out data port MotionDetected;
+  flows
+    motion_proc: flow path motion_in -> motion_out { latency => 1 ms .. 2 ms; };
+  properties
+    Compute_Execution_Time => 1 ms .. 2 ms;
+    SEI::MIPSBudget => 0.2 mips;
+    Deadline => 15 ms;
+    Dispatch_Protocol => Periodic;
+    Period => 20 ms;
+  
+end ReadMotionThread;
+
+thread CheckDoorThread
+  features
+    door_in: in data port DoorOpened;
+    door_out: out data port DoorOpened;
+  flows
+    door_proc: flow path door_in -> door_out { latency => 1 ms .. 2 ms; };
+  properties
+    Compute_Execution_Time => 1 ms .. 2 ms;
+    SEI::MIPSBudget => 0.2 mips;
+    Deadline => 15 ms;
+    Dispatch_Protocol => Periodic;
+    Period => 20 ms;
+   
+end CheckDoorThread;
+
+thread ReadSmokeThread
+  features
+    smoke_in: in data port SmokeDetected;
+    smoke_out: out data port SmokeDetected;
+  flows
+    smoke_proc: flow path smoke_in -> smoke_out { latency => 1 ms .. 2 ms; };
+  properties
+    Compute_Execution_Time => 1 ms .. 2 ms;
+    SEI::MIPSBudget => 0.2 mips;
+    Deadline => 15 ms;
+    Dispatch_Protocol => Periodic;
+    Period => 20 ms;
+
+end ReadSmokeThread;
+
+thread ReadTemperatureThread
+  features
+    temp_in: in data port OverheatDetected;
+    temp_out: out data port OverheatDetected;
+  flows
+    temp_proc: flow path temp_in -> temp_out { latency => 1 ms .. 2 ms; };
+  properties
+    Compute_Execution_Time => 1 ms .. 2 ms;
+    SEI::MIPSBudget => 0.2 mips;
+    Deadline => 15 ms;
+    Dispatch_Protocol => Periodic;
+    Period => 20 ms;
+
+end ReadTemperatureThread;
+
+thread EvaluateThreatThread
+  features
+    motion: in data port MotionDetected;
+    door: in data port DoorOpened;
+    smoke: in data port SmokeDetected;
+    temp: in data port OverheatDetected;
+    ctrl_in: in data port ControlSignal;
+    cmd_in: in data port UserCommandData;
+    
+    alarm_out: out data port AlarmDecision;
+    light_out: out data port LightAlarmSignal;
+    notify_out: out data port NotificationSignal;
+    log_out: out data port LogData;
+    status_out: out data port SystemStatusData;
+    
+  flows
+    alarm_motion: flow path motion -> alarm_out;
+    alarm_door: flow path door -> alarm_out;
+    alarm_smoke: flow path smoke -> alarm_out;
+    alarm_temp: flow path temp -> alarm_out;
+    alarm_ctrl: flow path ctrl_in -> alarm_out;
+    alarm_cmd: flow path cmd_in -> alarm_out;
+
+    light_motion: flow path motion -> light_out;
+    light_door: flow path door -> light_out;
+    light_smoke: flow path smoke -> light_out;
+    light_temp: flow path temp -> light_out;
+    light_ctrl: flow path ctrl_in -> light_out;
+
+    notify_motion: flow path motion -> notify_out;
+    notify_door: flow path door -> notify_out;
+    notify_smoke: flow path smoke -> notify_out;
+    notify_temp: flow path temp -> notify_out;
+    notify_ctrl: flow path ctrl_in -> notify_out;
+    notify_cmd: flow path cmd_in -> notify_out;
+    
+    log_motion: flow path motion -> log_out;
+    log_door: flow path door -> log_out;
+    log_smoke: flow path smoke -> log_out;
+    log_temp: flow path temp -> log_out;
+    log_ctrl: flow path ctrl_in -> log_out;
+    log_cmd: flow path cmd_in -> log_out;
+    status_flow: flow source status_out;
+  properties
+    Compute_Execution_Time => 4 ms .. 8 ms;
+    Deadline => 15 ms;
+    Dispatch_Protocol => Periodic;
+    Period => 20 ms;
+
+end EvaluateThreatThread;
+
+thread SendNotificationThread
+  features
+    notify_in: in data port NotificationSignal;
+    notify_out: out data port NotificationSignal;
+  flows
+    notify_proc: flow path notify_in -> notify_out { latency => 5 ms .. 10 ms; };
+  properties
+    Compute_Execution_Time => 2 ms .. 4 ms;
+    SEI::MIPSBudget => 0.8 mips;
+    Deadline => 20 ms;
+    Dispatch_Protocol => Periodic;
+    Period => 40 ms;
+
+end SendNotificationThread;
+
+thread ReadUserCommandThread
+  features
+    command_out: out data port UserCommandData;
+  flows
+    command_flow: flow source command_out;
+  properties
+    Compute_Execution_Time => 1 ms .. 2 ms;
+    SEI::MIPSBudget => 0.5 mips;
+    Deadline => 30 ms;
+    Dispatch_Protocol => Periodic;
+    Period => 100 ms;
+
+end ReadUserCommandThread;
+
+thread DisplaySystemStatusThread
+  features
+    status_in: in data port SystemStatusData;
+  flows
+    status_flow: flow sink status_in;
+  properties
+    Compute_Execution_Time => 1 ms .. 2 ms;
+    SEI::MIPSBudget => 0.2 mips;
+    Deadline => 30 ms;
+    Dispatch_Protocol => Periodic;
+    Period => 100 ms;
+
+end DisplaySystemStatusThread;
+
+thread LogWriterThread
+  features
+    log_in: in data port LogData;
+  flows
+    log_flow: flow sink log_in;
+  properties
+    Compute_Execution_Time => 3 ms .. 6 ms;
+    SEI::MIPSBudget => 0.3 mips;
+    Deadline => 50 ms;
+    Dispatch_Protocol => Sporadic;
+    Period => 100 ms;
+
+end LogWriterThread;
+
+
+-- PROCESSES 
+process SensorMonitorProc
+  features
+    motion_in: in data port MotionDetected;
+    motion_out: out data port MotionDetected;
+    door_in: in data port DoorOpened;
+    door_out: out data port DoorOpened;
+    smoke_in: in data port SmokeDetected;
+    smoke_out: out data port SmokeDetected;
+    temp_in: in data port OverheatDetected;
+    temp_out: out data port OverheatDetected;
+      flows
+    motion_flow: flow path motion_in -> motion_out;
+    door_flow: flow path door_in -> door_out;
+    smoke_flow: flow path smoke_in -> smoke_out;
+    temp_flow: flow path temp_in -> temp_out;
+end SensorMonitorProc;
+
+process implementation SensorMonitorProc.impl
+  subcomponents
+    motion_reader: thread ReadMotionThread;
+    door_reader: thread CheckDoorThread;
+    smoke_reader: thread ReadSmokeThread;
+    temp_reader: thread ReadTemperatureThread;
+  connections
+    motion_in_conn: port motion_in -> motion_reader.motion_in;
+    door_in_conn: port door_in -> door_reader.door_in;
+    smoke_in_conn: port smoke_in -> smoke_reader.smoke_in;
+    temp_in_conn: port temp_in -> temp_reader.temp_in;
+    motion_out_conn: port motion_reader.motion_out -> motion_out;
+    door_out_conn: port door_reader.door_out -> door_out;
+    smoke_out_conn: port smoke_reader.smoke_out -> smoke_out;
+    temp_out_conn: port temp_reader.temp_out -> temp_out;
+  flows
+    motion_flow: flow path motion_in -> motion_in_conn -> motion_reader.motion_proc -> motion_out_conn -> motion_out;
+    door_flow: flow path door_in -> door_in_conn -> door_reader.door_proc -> door_out_conn -> door_out;
+    smoke_flow: flow path smoke_in -> smoke_in_conn -> smoke_reader.smoke_proc -> smoke_out_conn -> smoke_out;
+    temp_flow: flow path temp_in -> temp_in_conn -> temp_reader.temp_proc -> temp_out_conn -> temp_out;	
+	properties
+		SEI::MIPSBudget => 0.9 mips;
+end SensorMonitorProc.impl;
+
+
+process LogProc
+  features
+    log_in: in data port LogData;
+  flows
+    log_event: flow sink log_in;
+end LogProc;
+
+process implementation LogProc.impl
+  subcomponents
+    writer: thread LogWriterThread;
+  connections
+    log_conn: port log_in -> writer.log_in;
+  flows
+    log_event: flow sink log_in -> log_conn -> writer.log_flow;
+  properties
+    SEI::MIPSBudget => 0.3 mips;
+end LogProc.impl;
+
+
+
+process AlarmProc
+  features
+    motion_in: in data port MotionDetected;
+    door_in: in data port DoorOpened;
+    smoke_in: in data port SmokeDetected;
+    temp_in: in data port OverheatDetected;
+    ctrl: in data port ControlSignal;
+    alarm_decision_out: out data port AlarmDecision;
+    light: out data port LightAlarmSignal;
+    notify_out: out data port NotificationSignal;
+    user_cmd: in data port UserCommandData;
+   	log_out: out data port LogData;
+   	status_out: out data port SystemStatusData;
+   	
+   	
+    
+  flows
+    alarm_path: flow path motion_in -> alarm_decision_out;
+    alarm_path_door: flow path door_in -> alarm_decision_out;
+    alarm_path_smoke: flow path smoke_in -> alarm_decision_out;
+    alarm_path_temp: flow path temp_in -> alarm_decision_out;
+    alarm_path_ctrl: flow path ctrl -> alarm_decision_out;
+    alarm_path_cmd: flow path user_cmd -> alarm_decision_out;
+
+    light_path: flow path motion_in -> light;
+    light_path_door: flow path door_in -> light;
+    light_path_smoke: flow path smoke_in -> light;
+    light_path_temp: flow path temp_in -> light;
+    light_path_ctrl: flow path ctrl -> light;
+
+    notify_path: flow path motion_in -> notify_out;
+    notify_path_door: flow path door_in -> notify_out;
+    notify_path_smoke: flow path smoke_in -> notify_out;
+    notify_path_temp: flow path temp_in -> notify_out;
+    notify_path_ctrl: flow path ctrl -> notify_out;
+    notify_path_cmd: flow path user_cmd -> notify_out;
+    
+    log_path: flow path motion_in -> log_out;
+    log_path_door: flow path door_in -> log_out;
+    log_path_smoke: flow path smoke_in -> log_out;
+    log_path_temp: flow path temp_in -> log_out;
+    log_path_ctrl: flow path ctrl -> log_out;
+   	log_path_cmd: flow path user_cmd -> log_out;
+    status_path: flow source status_out;
+    
+end AlarmProc;
+
+
+process implementation AlarmProc.impl
+  subcomponents
+    evaluator: thread EvaluateThreatThread;
+  connections
+    motion_conn: port motion_in -> evaluator.motion;
+    door_conn: port door_in -> evaluator.door;
+    smoke_conn: port smoke_in -> evaluator.smoke;
+    temp_conn: port temp_in -> evaluator.temp;
+    ctrl_conn: port ctrl -> evaluator.ctrl_in;
+    alarm_out_conn2: port evaluator.alarm_out -> alarm_decision_out;
+    light_out_conn: port evaluator.light_out -> light;
+    notify_conn: port evaluator.notify_out -> notify_out;
+    user_cmd_conn: port user_cmd -> evaluator.cmd_in;
+    log_conn: port evaluator.log_out -> log_out;
+    status_conn: port evaluator.status_out -> status_out;
+    
+    
+  flows
+    alarm_path: flow path motion_in -> motion_conn -> evaluator.alarm_motion -> alarm_out_conn2 -> alarm_decision_out;
+    alarm_path_door: flow path door_in -> door_conn -> evaluator.alarm_door -> alarm_out_conn2 -> alarm_decision_out;
+    alarm_path_smoke: flow path smoke_in -> smoke_conn -> evaluator.alarm_smoke -> alarm_out_conn2 -> alarm_decision_out;
+    alarm_path_temp: flow path temp_in -> temp_conn -> evaluator.alarm_temp -> alarm_out_conn2 -> alarm_decision_out;
+    alarm_path_ctrl: flow path ctrl -> ctrl_conn -> evaluator.alarm_ctrl -> alarm_out_conn2 -> alarm_decision_out;
+	alarm_path_cmd: flow path user_cmd -> user_cmd_conn -> evaluator.alarm_cmd -> alarm_out_conn2 -> alarm_decision_out;
+	
+    light_path: flow path motion_in -> motion_conn -> evaluator.light_motion -> light_out_conn -> light;
+    light_path_door: flow path door_in -> door_conn -> evaluator.light_door -> light_out_conn -> light;
+    light_path_smoke: flow path smoke_in -> smoke_conn -> evaluator.light_smoke -> light_out_conn -> light;
+    light_path_temp: flow path temp_in -> temp_conn -> evaluator.light_temp -> light_out_conn -> light;
+    light_path_ctrl: flow path ctrl -> ctrl_conn -> evaluator.light_ctrl -> light_out_conn -> light;
+
+    notify_path: flow path motion_in -> motion_conn -> evaluator.notify_motion -> notify_conn -> notify_out;
+    notify_path_door: flow path door_in -> door_conn -> evaluator.notify_door -> notify_conn -> notify_out;
+    notify_path_smoke: flow path smoke_in -> smoke_conn -> evaluator.notify_smoke -> notify_conn -> notify_out;
+    notify_path_temp: flow path temp_in -> temp_conn -> evaluator.notify_temp -> notify_conn -> notify_out;
+    notify_path_ctrl: flow path ctrl -> ctrl_conn -> evaluator.notify_ctrl -> notify_conn -> notify_out;
+    
+    
+    log_path: flow path motion_in -> motion_conn -> evaluator.log_motion -> log_conn -> log_out;
+    log_path_door: flow path door_in -> door_conn -> evaluator.log_door -> log_conn -> log_out;
+    log_path_smoke: flow path smoke_in -> smoke_conn -> evaluator.log_smoke -> log_conn -> log_out;
+    log_path_temp: flow path temp_in -> temp_conn -> evaluator.log_temp -> log_conn -> log_out;
+    log_path_ctrl: flow path ctrl -> ctrl_conn -> evaluator.log_ctrl -> log_conn -> log_out;
+   	log_path_cmd: flow path user_cmd -> user_cmd_conn -> evaluator.log_cmd -> log_conn -> log_out;
+    
+	status_path: flow source evaluator.status_flow -> status_conn -> status_out;
+    
+	properties		
+		SEI::MIPSBudget => 0.7 mips;
+
+end AlarmProc.impl;
+
+
+
+process NotificationProc
+  features
+    notify_in: in data port NotificationSignal;
+    notify_out: out data port NotificationSignal;
+  flows
+    notification_flow: flow path notify_in -> notify_out;
+end NotificationProc;
+
+process implementation NotificationProc.impl
+  subcomponents
+    notifier: thread SendNotificationThread;
+  connections
+    notify_in_conn: port notify_in -> notifier.notify_in;
+    notify_out_conn: port notifier.notify_out -> notify_out;
+  flows
+    notification_flow: flow path notify_in -> notify_in_conn -> notifier.notify_proc -> notify_out_conn -> notify_out;
+	properties
+		SEI::MIPSBudget => 0.3 mips;
+
+end NotificationProc.impl;
+
+
+process UserInterfaceProc
+  features
+    command_out: out data port UserCommandData;
+    status_in: in data port SystemStatusData;
+  flows
+    user_command: flow source command_out;
+    system_status: flow sink status_in;
+end UserInterfaceProc;
+
+
+process implementation UserInterfaceProc.impl
+  subcomponents
+    reader: thread ReadUserCommandThread;
+    display: thread DisplaySystemStatusThread;
+  connections
+    out_conn: port reader.command_out -> command_out;
+    in_conn: port status_in -> display.status_in;
+  flows
+    user_command: flow source reader.command_flow -> out_conn -> command_out;
+  	system_status: flow sink status_in -> in_conn -> display.status_flow;
+  properties
+    SEI::MIPSBudget => 0.4 mips;
+end UserInterfaceProc.impl;
+
+
+
+
+
+-- SYSTEM
+system AlarmSystem
+end AlarmSystem;
+
+system implementation AlarmSystem.impl
+  subcomponents
+    sensor_monitor: process SensorMonitorProc.impl;
+    alarm_logic: process AlarmProc.impl;
+    notifier: process NotificationProc.impl;
+    user_interface: process UserInterfaceProc.impl;
+    motion_sensor: device MotionSensor;
+    door_sensor: device DoorSensor;
+    smoke_sensor: device SmokeSensor;
+    temp_sensor: device TemperatureSensor;
+    control_panel: device ControlPanel;
+    siren: device Siren;
+    light_alarm: device LightAlarm;
+    network: device NetworkInterface;
+    ui_panel: device UserInterfacePanel;
+    cpu: processor CPU_Main;
+    cpu_ui: processor CPU_UI;
+    ram: memory RAM;
+    log_memory: memory LogMemory;
+    main_bus: bus MainBus;
+    i2c_bus: bus I2CBus;
+  	spi_bus: bus SPIBus;
+  	ui_bus: bus UIBus;
+  	logger: process LogProc.impl;
+  	
+
+    
+	connections
+		
+  motion_bus: bus access cpu.i2c_access -> motion_sensor.bus_access;
+  door_bus: bus access cpu.i2c_access -> door_sensor.bus_access;
+  smoke_bus: bus access cpu.i2c_access -> smoke_sensor.bus_access;
+  temp_bus: bus access cpu.i2c_access -> temp_sensor.bus_access;
+  
+  ctrl_bus: bus access cpu.spi_access -> control_panel.bus_access;
+  siren_bus: bus access cpu.spi_access -> siren.bus_access;
+  light_bus: bus access cpu.spi_access -> light_alarm.bus_access;
+  net_bus: bus access cpu.spi_access -> network.bus_access;
+  
+  uibus: bus access cpu_ui.ui_bus_access -> ui_panel.bus_access;
+  
+  cpu_to_ram: bus access cpu.main_bus_access -> ram.bus_access;
+  cpu_to_log: bus access cpu.main_bus_access -> log_memory.bus_access;
+	
+		
+    conn_motion_dev: port motion_sensor.motion_out -> sensor_monitor.motion_in;
+    conn_door_dev: port door_sensor.door_out -> sensor_monitor.door_in;
+    conn_smoke_dev: port smoke_sensor.smoke_out -> sensor_monitor.smoke_in;
+    conn_temp_dev: port temp_sensor.temp_out -> sensor_monitor.temp_in;
+
+    conn_motion: port sensor_monitor.motion_out -> alarm_logic.motion_in;
+    conn_door: port sensor_monitor.door_out -> alarm_logic.door_in;
+    conn_smoke: port sensor_monitor.smoke_out -> alarm_logic.smoke_in;
+    conn_temp: port sensor_monitor.temp_out -> alarm_logic.temp_in;
+    conn_ctrl: port control_panel.control_out -> alarm_logic.ctrl;
+
+    conn_alarm: port alarm_logic.alarm_decision_out -> siren.alarm_in;
+    conn_light: port alarm_logic.light -> light_alarm.light_in;
+
+    conn_notify: port alarm_logic.notify_out -> notifier.notify_in;
+    conn_notify_out: port notifier.notify_out -> network.notify_in;
+
+    conn_ui_cmd: port user_interface.command_out -> ui_panel.command_in;
+	conn_ui_to_alarm: port ui_panel.command_out -> alarm_logic.user_cmd;
+
+    conn_ui_status: port ui_panel.status_out -> user_interface.status_in;
+	conn_log: port alarm_logic.log_out -> logger.log_in;
+	
+    conn_status: port alarm_logic.status_out -> ui_panel.status_in;
+    
+
+	 
+
+
+  flows
+    motion_to_siren: end to end flow
+      motion_sensor.motion_src -> conn_motion_dev 
+      -> sensor_monitor.motion_flow -> conn_motion
+      -> alarm_logic.alarm_path -> conn_alarm
+      -> siren.siren_sink
+      { latency => 15 ms .. 30 ms; };
+
+    door_to_siren: end to end flow
+      door_sensor.door_src -> conn_door_dev
+      -> sensor_monitor.door_flow -> conn_door
+      -> alarm_logic.alarm_path_door -> conn_alarm
+      -> siren.siren_sink
+      { latency => 12 ms .. 25 ms; };
+
+    smoke_to_siren: end to end flow
+      smoke_sensor.smoke_src -> conn_smoke_dev
+      -> sensor_monitor.smoke_flow -> conn_smoke
+      -> alarm_logic.alarm_path_smoke -> conn_alarm
+      -> siren.siren_sink
+      { latency => 15 ms .. 30 ms; };
+
+    temp_to_siren: end to end flow
+      temp_sensor.temp_src -> conn_temp_dev
+      -> sensor_monitor.temp_flow -> conn_temp
+      -> alarm_logic.alarm_path_temp -> conn_alarm
+      -> siren.siren_sink
+      { latency => 15 ms .. 30 ms; };
+
+    ctrl_to_siren: end to end flow
+      control_panel.control_src -> conn_ctrl
+      -> alarm_logic.alarm_path_ctrl -> conn_alarm
+      -> siren.siren_sink
+      { latency => 15 ms .. 30 ms; };
+
+    motion_to_light: end to end flow
+      motion_sensor.motion_src -> conn_motion_dev 
+      -> sensor_monitor.motion_flow -> conn_motion
+      -> alarm_logic.light_path -> conn_light
+      -> light_alarm.light_sink
+      { latency => 15 ms .. 30 ms; };
+
+    door_to_light: end to end flow
+      door_sensor.door_src -> conn_door_dev
+      -> sensor_monitor.door_flow -> conn_door
+      -> alarm_logic.light_path_door -> conn_light
+      -> light_alarm.light_sink
+      { latency => 15 ms .. 30 ms; };
+
+    smoke_to_light: end to end flow
+      smoke_sensor.smoke_src -> conn_smoke_dev
+      -> sensor_monitor.smoke_flow -> conn_smoke
+      -> alarm_logic.light_path_smoke -> conn_light
+      -> light_alarm.light_sink
+      { latency => 15 ms .. 30 ms; };
+
+    temp_to_light: end to end flow
+      temp_sensor.temp_src -> conn_temp_dev
+      -> sensor_monitor.temp_flow -> conn_temp
+      -> alarm_logic.light_path_temp -> conn_light
+      -> light_alarm.light_sink
+      { latency => 15 ms .. 30 ms; };
+
+    ctrl_to_light: end to end flow
+      control_panel.control_src -> conn_ctrl
+      -> alarm_logic.light_path_ctrl -> conn_light
+      -> light_alarm.light_sink
+      { latency => 15 ms .. 30 ms; };
+
+    motion_to_notify: end to end flow
+      motion_sensor.motion_src -> conn_motion_dev
+      -> sensor_monitor.motion_flow -> conn_motion
+      -> alarm_logic.notify_path -> conn_notify
+      -> notifier.notification_flow -> conn_notify_out
+      -> network.notify_sink
+      { latency => 10 ms .. 20 ms; };
+
+    door_to_notify: end to end flow
+      door_sensor.door_src -> conn_door_dev
+      -> sensor_monitor.door_flow -> conn_door
+      -> alarm_logic.notify_path_door -> conn_notify
+      -> notifier.notification_flow -> conn_notify_out
+      -> network.notify_sink
+      { latency => 10 ms .. 20 ms; };
+
+    smoke_to_notify: end to end flow
+      smoke_sensor.smoke_src -> conn_smoke_dev
+      -> sensor_monitor.smoke_flow -> conn_smoke
+      -> alarm_logic.notify_path_smoke -> conn_notify
+      -> notifier.notification_flow -> conn_notify_out
+      -> network.notify_sink
+      { latency => 10 ms .. 20 ms; };
+
+    temp_to_notify: end to end flow
+      temp_sensor.temp_src -> conn_temp_dev
+      -> sensor_monitor.temp_flow -> conn_temp
+      -> alarm_logic.notify_path_temp -> conn_notify
+      -> notifier.notification_flow -> conn_notify_out
+      -> network.notify_sink
+      { latency => 10 ms .. 20 ms; };
+
+    ctrl_to_notify: end to end flow
+      control_panel.control_src -> conn_ctrl
+      -> alarm_logic.notify_path_ctrl -> conn_notify
+      -> notifier.notification_flow -> conn_notify_out
+      -> network.notify_sink
+      { latency => 10 ms .. 20 ms; };
+      
+     user_cmd_to_alarm: end to end flow
+	  user_interface.user_command ->
+	  conn_ui_cmd ->
+	  ui_panel.forward_cmd ->
+	  conn_ui_to_alarm ->
+	  alarm_logic.alarm_path_cmd;
+	     
+     
+    status_to_display: end to end flow
+	  ui_panel.status_src ->
+	  conn_ui_status ->
+	  user_interface.system_status
+	  { latency => 10 ms .. 20 ms; };
+	    
+	 motion_to_log: end to end flow
+      motion_sensor.motion_src -> conn_motion_dev 
+      -> sensor_monitor.motion_flow -> conn_motion
+      -> alarm_logic.log_path -> conn_log
+      -> logger.log_event
+      { latency => 10 ms .. 20 ms; };
+
+    door_to_log: end to end flow
+      door_sensor.door_src -> conn_door_dev
+      -> sensor_monitor.door_flow -> conn_door
+      -> alarm_logic.log_path_door -> conn_log
+      -> logger.log_event
+      { latency => 10 ms .. 20 ms; };
+
+    smoke_to_log: end to end flow
+      smoke_sensor.smoke_src -> conn_smoke_dev
+      -> sensor_monitor.smoke_flow -> conn_smoke
+      -> alarm_logic.log_path_smoke -> conn_log
+      -> logger.log_event
+      { latency => 10 ms .. 20 ms; };
+
+    temp_to_log: end to end flow
+      temp_sensor.temp_src -> conn_temp_dev
+      -> sensor_monitor.temp_flow -> conn_temp
+      -> alarm_logic.log_path_temp -> conn_log
+      -> logger.log_event
+      { latency => 10 ms .. 20 ms; };
+
+    ctrl_to_log: end to end flow
+      control_panel.control_src -> conn_ctrl
+      -> alarm_logic.log_path_ctrl -> conn_log
+      -> logger.log_event
+      { latency => 10 ms .. 20 ms; };
+
+    cmd_to_log: end to end flow
+      user_interface.user_command -> conn_ui_cmd
+      -> ui_panel.forward_cmd -> conn_ui_to_alarm
+      -> alarm_logic.log_path_cmd -> conn_log
+      -> logger.log_event
+      { latency => 10 ms .. 20 ms; };
+	     
+	     
+
+
+  properties
+    -- przypisania procesów do procesorów
+    Actual_Processor_Binding => (reference (cpu)) applies to sensor_monitor;
+    Actual_Processor_Binding => (reference (cpu)) applies to alarm_logic;
+    Actual_Processor_Binding => (reference (cpu)) applies to notifier;
+    Actual_Processor_Binding => (reference (cpu_ui)) applies to user_interface;
+    Actual_Processor_Binding => (reference (cpu)) applies to logger;
+    
+
+    -- przypisania procesów do pamięci
+    Actual_Memory_Binding => (reference (ram)) applies to sensor_monitor;
+    Actual_Memory_Binding => (reference (ram)) applies to alarm_logic;
+    Actual_Memory_Binding => (reference (log_memory)) applies to logger;
+    Actual_Memory_Binding => (reference (ram)) applies to notifier;
+    Actual_Memory_Binding => (reference (ram)) applies to user_interface;
+    
+
+    -- przypisania połączeń do magistrali
+    Actual_Connection_Binding => (reference (spi_bus)) applies to conn_notify_out;
+    Actual_Connection_Binding => (reference (spi_bus)) applies to conn_alarm;
+    Actual_Connection_Binding => (reference (spi_bus)) applies to conn_light;
+    Actual_Connection_Binding => (reference (spi_bus)) applies to conn_notify;
+    Actual_Connection_Binding => (reference (main_bus)) applies to conn_ui_status;
+
+    Actual_Connection_Binding => (reference (spi_bus)) applies to conn_ctrl;
+    Actual_Connection_Binding => (reference (spi_bus)) applies to conn_ui_cmd;
+    Actual_Connection_Binding => (reference (spi_bus)) applies to conn_ui_to_alarm;
+
+    Actual_Connection_Binding => (reference (i2c_bus)) applies to conn_motion_dev;
+    Actual_Connection_Binding => (reference (i2c_bus)) applies to conn_smoke_dev;
+    Actual_Connection_Binding => (reference (i2c_bus)) applies to conn_temp_dev;
+    Actual_Connection_Binding => (reference (i2c_bus)) applies to conn_door_dev;
+
+    Actual_Connection_Binding => (reference (main_bus)) applies to conn_motion;
+    Actual_Connection_Binding => (reference (main_bus)) applies to conn_door;
+    Actual_Connection_Binding => (reference (main_bus)) applies to conn_smoke;
+    Actual_Connection_Binding => (reference (main_bus)) applies to conn_temp;
+    Actual_Connection_Binding => (reference (main_bus)) applies to conn_log;
+    Actual_Connection_Binding => (reference (main_bus)) applies to conn_status;
+    
+  Actual_Connection_Binding => (reference (i2c_bus)) applies to motion_bus, door_bus, smoke_bus, temp_bus;
+  Actual_Connection_Binding => (reference (spi_bus)) applies to ctrl_bus, siren_bus, light_bus, net_bus;
+ 
+  Actual_Connection_Binding => (reference (ui_bus)) applies to uibus;
+  Actual_Connection_Binding => (reference (main_bus)) applies to cpu_to_ram, cpu_to_log;
+    
+    
+    SEI::WeightLimit => 5.0kg;
+    SEI::MIPSCapacity => 3.4 mips;
+
+    
+
+end AlarmSystem.impl;
+
+
+end AlarmSystem;
