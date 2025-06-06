@@ -2,9 +2,9 @@
 Model instalacji alarmowej 
 
 ### 2. Dane studenta
-Imię i nazwisko: Monika Halek
+Monika Halek
 
-E-mail: mhalek@student.agh.edu.pl
+mhalek@student.agh.edu.pl
 
 ### 3. Opis modelowanego systemu
 Instalacja alarmowa to system przeznaczony do wykrywania zagrożeń w budynku, takich jak nieautoryzowany ruch, otwarcie drzwi, wykrycie dymu lub przegrzania. System podejmuje decyzje w oparciu o dane z czujników oraz polecenia użytkownika. W odpowiedzi na zagrożenie aktywuje alarm dźwiękowy i świetlny, generuje powiadomienia sieciowe oraz zapisuje zdarzenia do logów.
@@ -80,9 +80,22 @@ Dane z czujników są odbierane przez dedykowane wątki przetwarzające, które 
 - **AlarmSystem** - główny system integrujący wszystkie komponenty
 
 ### 5. Diagram modelu
-![diagram1](https://github.com/user-attachments/assets/0e6979fe-43d5-42a8-b534-3b0208f99e79)
+![diagram](https://github.com/user-attachments/assets/3b955a5d-c195-486b-ae4e-a915d75605fd)
+
 
 ### 6. Przeprowadzone analizy
+
+- Scheduability report - raport harmonogramowania
+![image](https://github.com/user-attachments/assets/10104059-d5f4-4fef-ace8-0f8bc9645c60)
+
+
+- Bus Load analysis - analiza obciążenia magistral
+![image](https://github.com/user-attachments/assets/defee976-df68-405b-9600-cd7b84c362e3)
+
+
+- Weight totals report - raport wagowy
+![image](https://github.com/user-attachments/assets/dbf21906-20ff-4b7c-9337-b651cdce0ee3)
+
 
 ### 7. Bibliografia
 
