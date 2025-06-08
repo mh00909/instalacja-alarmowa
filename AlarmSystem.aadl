@@ -90,6 +90,7 @@ bus I2CBus
     SEI::BandWidthBudget => 100.0 KBytesps;
     Transmission_Time => [Fixed => 2 ns .. 5 ns; PerByte => 10 ns .. 15 ns;];
     Period => 2 ms;
+    SEI::GrossWeight => 0.1kg;
 end I2CBus;
 
 bus SPIBus
@@ -98,6 +99,7 @@ bus SPIBus
     SEI::BandWidthBudget => 500.0 KBytesps;
     Transmission_Time => [Fixed => 1 ns .. 2 ns; PerByte => 5 ns .. 6 ns;];
     Period => 1 ms;
+    SEI::GrossWeight => 0.1kg;
 end SPIBus;
 
 bus UIBus
@@ -106,6 +108,7 @@ bus UIBus
     SEI::BandWidthBudget => 500.0 KBytesps;
     Transmission_Time => [Fixed => 1 ns .. 2 ns; PerByte => 5 ns .. 6 ns;];
     Period => 1 ms;
+    SEI::GrossWeight => 0.1kg;
 end UIBus;
 
 -- DEVICES
@@ -228,22 +231,22 @@ end UserInterfacePanel;
 -- PROCESSOR
 processor CPU_Main
   features
-    main_bus_access: provides bus access MainBus;
-    i2c_access: provides bus access I2CBus;
-    spi_access: provides bus access SPIBus;
+    main_bus_access: requires bus access MainBus;
+    i2c_access: requires bus access I2CBus;
+    spi_access: requires bus access SPIBus;
   properties
     SEI::GrossWeight => 0.05kg;
     Scheduling_Protocol => (Round_Robin_Protocol);
     Clock_Period => 1 ms;
-    Timing_Properties::Processor_Capacity => 1.0 MIPS;
-    SEI::MIPSCapacity => 2.5 mips;
+    Timing_Properties::Processor_Capacity => 10.0 MIPS;
+    SEI::MIPSCapacity => 6.5 mips;
 end CPU_Main;
 
 processor CPU_UI
   features
-    ui_bus_access: provides bus access UIBus;
+    ui_bus_access: requires bus access UIBus;
   properties
-    SEI::MIPSCapacity => 1.2 mips;
+    SEI::MIPSCapacity => 12.5 mips;
     Scheduling_Protocol => (Round_Robin_Protocol);
     SEI::GrossWeight => 0.05kg;
     Clock_Period => 1 ms; 
@@ -347,38 +350,39 @@ thread EvaluateThreatThread
     status_out: out data port SystemStatusData;
     
   flows
-    alarm_motion: flow path motion -> alarm_out;
-    alarm_door: flow path door -> alarm_out;
-    alarm_smoke: flow path smoke -> alarm_out;
-    alarm_temp: flow path temp -> alarm_out;
-    alarm_ctrl: flow path ctrl_in -> alarm_out;
-    alarm_cmd: flow path cmd_in -> alarm_out;
-
-    light_motion: flow path motion -> light_out;
-    light_door: flow path door -> light_out;
-    light_smoke: flow path smoke -> light_out;
-    light_temp: flow path temp -> light_out;
-    light_ctrl: flow path ctrl_in -> light_out;
-
-    notify_motion: flow path motion -> notify_out;
-    notify_door: flow path door -> notify_out;
-    notify_smoke: flow path smoke -> notify_out;
-    notify_temp: flow path temp -> notify_out;
-    notify_ctrl: flow path ctrl_in -> notify_out;
-    notify_cmd: flow path cmd_in -> notify_out;
+    alarm_motion: flow path motion -> alarm_out { latency => 1 ms .. 2 ms; };
+    alarm_door: flow path door -> alarm_out { latency => 1 ms .. 2 ms; };
+    alarm_smoke: flow path smoke -> alarm_out { latency => 1 ms .. 2 ms; };
+    alarm_temp: flow path temp -> alarm_out { latency => 1 ms .. 2 ms; };
+    alarm_ctrl: flow path ctrl_in -> alarm_out { latency => 1 ms .. 2 ms; };
+    alarm_cmd: flow path cmd_in -> alarm_out { latency => 1 ms .. 2 ms; };
     
-    log_motion: flow path motion -> log_out;
-    log_door: flow path door -> log_out;
-    log_smoke: flow path smoke -> log_out;
-    log_temp: flow path temp -> log_out;
-    log_ctrl: flow path ctrl_in -> log_out;
-    log_cmd: flow path cmd_in -> log_out;
-    status_flow: flow source status_out;
+    light_motion: flow path motion -> light_out { latency => 1 ms .. 2 ms; };
+    light_door: flow path door -> light_out { latency => 1 ms .. 2 ms; };
+    light_smoke: flow path smoke -> light_out { latency => 1 ms .. 2 ms; };
+    light_temp: flow path temp -> light_out { latency => 1 ms .. 2 ms; };
+    light_ctrl: flow path ctrl_in -> light_out { latency => 1 ms .. 2 ms; };
+
+    notify_motion: flow path motion -> notify_out { latency => 1 ms .. 2 ms; };
+    notify_door: flow path door -> notify_out { latency => 1 ms .. 2 ms; };
+    notify_smoke: flow path smoke -> notify_out { latency => 1 ms .. 2 ms; };
+    notify_temp: flow path temp -> notify_out { latency => 1 ms .. 2 ms; };
+    notify_ctrl: flow path ctrl_in -> notify_out { latency => 1 ms .. 2 ms; };
+    notify_cmd: flow path cmd_in -> notify_out { latency => 1 ms .. 2 ms; };
+    
+    log_motion: flow path motion -> log_out { latency => 1 ms .. 2 ms; };
+    log_door: flow path door -> log_out { latency => 1 ms .. 2 ms; };
+    log_smoke: flow path smoke -> log_out { latency => 1 ms .. 2 ms; };
+    log_temp: flow path temp -> log_out { latency => 1 ms .. 2 ms; };
+    log_ctrl: flow path ctrl_in -> log_out { latency => 1 ms .. 2 ms; };
+    log_cmd: flow path cmd_in -> log_out { latency => 1 ms .. 2 ms; };
+    status_flow: flow source status_out { latency => 1 ms .. 2 ms; };
   properties
     Compute_Execution_Time => 4 ms .. 8 ms;
-    Deadline => 15 ms;
+    Deadline => 90 ms;
     Dispatch_Protocol => Periodic;
-    Period => 20 ms;
+    SEI::MIPSBudget => 0.2 mips;
+    Period => 90 ms;
 
 end EvaluateThreatThread;
 
@@ -401,7 +405,7 @@ thread ReadUserCommandThread
   features
     command_out: out data port UserCommandData;
   flows
-    command_flow: flow source command_out;
+    command_flow: flow source command_out { latency => 1 ms .. 2 ms; };
   properties
     Compute_Execution_Time => 1 ms .. 2 ms;
     SEI::MIPSBudget => 0.5 mips;
@@ -415,21 +419,20 @@ thread DisplaySystemStatusThread
   features
     status_in: in data port SystemStatusData;
   flows
-    status_flow: flow sink status_in;
+    status_flow: flow sink status_in { latency => 1 ms .. 2 ms; };
   properties
     Compute_Execution_Time => 1 ms .. 2 ms;
     SEI::MIPSBudget => 0.2 mips;
     Deadline => 30 ms;
     Dispatch_Protocol => Periodic;
     Period => 100 ms;
-
 end DisplaySystemStatusThread;
 
 thread LogWriterThread
   features
     log_in: in data port LogData;
   flows
-    log_flow: flow sink log_in;
+    log_flow: flow sink log_in { latency => 1 ms .. 2 ms; };
   properties
     Compute_Execution_Time => 3 ms .. 6 ms;
     SEI::MIPSBudget => 0.3 mips;
@@ -687,22 +690,28 @@ system implementation AlarmSystem.impl
 
     
 	connections
+
+  cpu_i2c: bus access i2c_bus -> cpu.i2c_access;
+  cpu_spi: bus access spi_bus -> cpu.spi_access;
+  cpu_main: bus access main_bus -> cpu.main_bus_access;
+  cpu_ui_bus: bus access ui_bus -> cpu_ui.ui_bus_access;
 		
-  motion_bus: bus access cpu.i2c_access -> motion_sensor.bus_access;
-  door_bus: bus access cpu.i2c_access -> door_sensor.bus_access;
-  smoke_bus: bus access cpu.i2c_access -> smoke_sensor.bus_access;
-  temp_bus: bus access cpu.i2c_access -> temp_sensor.bus_access;
-  
-  ctrl_bus: bus access cpu.spi_access -> control_panel.bus_access;
-  siren_bus: bus access cpu.spi_access -> siren.bus_access;
-  light_bus: bus access cpu.spi_access -> light_alarm.bus_access;
-  net_bus: bus access cpu.spi_access -> network.bus_access;
-  
-  uibus: bus access cpu_ui.ui_bus_access -> ui_panel.bus_access;
-  
-  cpu_to_ram: bus access cpu.main_bus_access -> ram.bus_access;
-  cpu_to_log: bus access cpu.main_bus_access -> log_memory.bus_access;
+	motion_bus: bus access i2c_bus -> motion_sensor.bus_access;
+	door_bus: bus access i2c_bus -> door_sensor.bus_access;
+	smoke_bus: bus access i2c_bus -> smoke_sensor.bus_access;
+	temp_bus: bus access i2c_bus -> temp_sensor.bus_access;
 	
+	ctrl_bus: bus access spi_bus -> control_panel.bus_access;
+	siren_bus: bus access spi_bus -> siren.bus_access;
+	light_bus: bus access spi_bus -> light_alarm.bus_access;
+	net_bus: bus access spi_bus -> network.bus_access;
+	
+	ui_bus_conn: bus access ui_bus -> ui_panel.bus_access;
+	
+	cpu_to_ram: bus access main_bus -> ram.bus_access;
+	cpu_to_log: bus access main_bus -> log_memory.bus_access;
+	  	
+		
 		
     conn_motion_dev: port motion_sensor.motion_out -> sensor_monitor.motion_in;
     conn_door_dev: port door_sensor.door_out -> sensor_monitor.door_in;
@@ -846,8 +855,8 @@ system implementation AlarmSystem.impl
 	  conn_ui_cmd ->
 	  ui_panel.forward_cmd ->
 	  conn_ui_to_alarm ->
-	  alarm_logic.alarm_path_cmd;
-	     
+	  alarm_logic.alarm_path_cmd
+	 { latency => 3 ms .. 6 ms; };
      
     status_to_display: end to end flow
 	  ui_panel.status_src ->
@@ -942,8 +951,10 @@ system implementation AlarmSystem.impl
   Actual_Connection_Binding => (reference (i2c_bus)) applies to motion_bus, door_bus, smoke_bus, temp_bus;
   Actual_Connection_Binding => (reference (spi_bus)) applies to ctrl_bus, siren_bus, light_bus, net_bus;
  
-  Actual_Connection_Binding => (reference (ui_bus)) applies to uibus;
   Actual_Connection_Binding => (reference (main_bus)) applies to cpu_to_ram, cpu_to_log;
+  
+  
+  
     
     
     SEI::WeightLimit => 5.0kg;
