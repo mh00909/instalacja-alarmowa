@@ -9,9 +9,7 @@ mhalek@student.agh.edu.pl
 ### 3. Opis modelowanego systemu
 Instalacja alarmowa to system przeznaczony do wykrywania zagrożeń w budynku, takich jak nieautoryzowany ruch, otwarcie drzwi, wykrycie dymu lub przegrzania. System podejmuje decyzje w oparciu o dane z czujników oraz polecenia użytkownika. W odpowiedzi na zagrożenie aktywuje alarm dźwiękowy i świetlny, generuje powiadomienia sieciowe oraz zapisuje zdarzenia do logów.
 
-Dane z czujników są odbierane przez dedykowane wątki przetwarzające, które działają w ramach procesu monitorującego. Logika alarmowa i podejmowanie decyzji realizowane są w osobnym procesie decyzyjnym. Obsługa użytkownika (komendy i status) oraz wysyłanie powiadomień są realizowane przez osobne procesy. Komunikacja między komponentami odbywa się poprzez dedykowane magistrale.
-
-
+Dane z czujników są odbierane przez dedykowane wątki przetwarzające, które działają w ramach procesu monitorującego. Logika alarmowa i podejmowanie decyzji realizowane są w osobnym procesie decyzyjnym. Obsługa użytkownika (komendy i status) oraz wysyłanie powiadomień są realizowane przez osobne procesy. 
 
 **Funkcjonalności systemu:**
 - Wykrywanie ruchu
